@@ -43,7 +43,7 @@ export async function GET(req: Request) {
     );
 
     const data = deduped.map((log) => ({
-      date: (log.createdAt as Date).toISOString().split("T")[0],
+      date: (log.createdAt as Date).toISOString(), // full timestamp — client formats in local TZ
       sleepHours: log.sleepHours,
       studyHours: log.studyHours,
       stressLevel: log.stressLevel,

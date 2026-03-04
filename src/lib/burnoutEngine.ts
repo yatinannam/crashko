@@ -119,9 +119,10 @@ export function computeBurnout(input: ComputeInput): BurnoutResult {
   // ── Dynamic Pomodoro recommendation ──────────────────────────────────────
   // Continuous formula: high burnout → shorter blocks; well-rested → longer
   // Range: 15 min (score 100) to 60 min (score 0), adjusted by sleep quality
-  const baseFocus = Math.round(60 - (score / 100) * 35);
-  const sleepBonus = sleepHours >= 7 ? 5 : sleepHours < 5 ? -5 : 0;
-  const focusMode = clamp(baseFocus + sleepBonus, 15, 60);
+  // Pomodoro range: 45 min (low burnout) → 15 min (high burnout), sleep-adjusted
+  const baseFocus = Math.round(45 - (score / 100) * 30);
+  const sleepBonus = sleepHours >= 7 ? 3 : sleepHours < 5 ? -3 : 0;
+  const focusMode = clamp(baseFocus + sleepBonus, 15, 45);
 
   return { score, risk, flags, crashProbability, focusMode };
 }

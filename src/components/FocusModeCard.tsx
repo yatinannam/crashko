@@ -39,13 +39,15 @@ export default function FocusModeCard({ minutes }: FocusModeCardProps) {
   }, [state]);
 
   const total = minutes * 60;
-  const progress = ((total - secondsLeft) / total) * 100;
+  // progress: 0 at start → 100 at end (used to DRAIN the circle)
+  const progress = total > 0 ? ((total - secondsLeft) / total) * 100 : 0;
 
   const mm = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
   const ss = String(secondsLeft % 60).padStart(2, "0");
 
   const circumference = 2 * Math.PI * 40;
-  const strokeDashoffset = circumference * (1 - progress / 100);
+  // dashoffset 0 = full circle (idle/start), circumference = empty (done)
+  const strokeDashoffset = circumference * (progress / 100);
 
   const handleToggle = () => {
     if (state === "done") {
