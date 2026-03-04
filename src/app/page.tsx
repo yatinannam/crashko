@@ -22,7 +22,13 @@ export default function Home() {
 
   const handleSubmit = async (data: Parameters<typeof submitForm>[0]) => {
     await submitForm(data);
-    refetchTrends();
+    // Small delay so MongoDB has committed the new log before we query trends
+    setTimeout(() => refetchTrends(), 800);
+  };
+
+  const handleReset = () => {
+    reset();
+    refetchTrends(); // refresh chart with the log we just saved
   };
 
   return (
@@ -115,7 +121,7 @@ export default function Home() {
 
             <div className="text-center">
               <button
-                onClick={reset}
+                onClick={handleReset}
                 className="rounded-xl border border-slate-200 px-6 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 ← Log Another Day

@@ -33,6 +33,7 @@ export default function TrendGraph({ data }: TrendGraphProps) {
   const chartData = data.map((d) => ({
     date: formatDate(d.date),
     "Burnout Score": d.burnoutScore,
+    "Crash %": d.crashProbability ?? undefined,
     "Sleep (h)": d.sleepHours,
     "Study (h)": d.studyHours,
     Stress: d.stressLevel,
@@ -79,6 +80,15 @@ export default function TrendGraph({ data }: TrendGraphProps) {
             strokeWidth={2}
             dot={{ r: 3 }}
             activeDot={{ r: 5 }}
+          />
+          <Line
+            type="monotone"
+            dataKey="Crash %"
+            stroke="#f97316"
+            strokeWidth={2}
+            strokeDasharray="4 2"
+            dot={{ r: 3 }}
+            connectNulls
           />
           <Line
             type="monotone"

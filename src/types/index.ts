@@ -42,4 +42,5 @@ export interface TrendDay {
   stressLevel: number;
   burnoutScore: number;
   risk: string;
+  crashProbability?: number;
 }

@@ -16,27 +16,48 @@ const defaultValues: BurnoutInput = {
   deadlinesSoon: 0,
 };
 
+// Raw string values for controlled inputs (avoids NaN when field is cleared)
+type RawForm = Record<keyof BurnoutInput, string>;
+
+const toRaw = (v: BurnoutInput): RawForm =>
+  Object.fromEntries(
+    Object.entries(v).map(([k, val]) => [k, String(val)]),
+  ) as RawForm;
+
 export default function BurnoutForm({ onSubmit, loading }: BurnoutFormProps) {
   const [form, setForm] = useState<BurnoutInput>(defaultValues);
+  const [raw, setRaw] = useState<RawForm>(toRaw(defaultValues));
   const [errors, setErrors] = useState<
     Partial<Record<keyof BurnoutInput, string>>
   >({});
 
   const validate = (): boolean => {
     const e: typeof errors = {};
-    if (form.sleepHours < 0 || form.sleepHours > 24)
-      e.sleepHours = "0–24 hours";
-    if (form.studyHours < 0 || form.studyHours > 24)
-      e.studyHours = "0–24 hours";
-    if (form.stressLevel < 1 || form.stressLevel > 10) e.stressLevel = "1–10";
-    if (form.tasksPending < 0) e.tasksPending = "Cannot be negative";
-    if (form.deadlinesSoon < 0) e.deadlinesSoon = "Cannot be negative";
+    if (isNaN(form.sleepHours) || form.sleepHours < 0 || form.sleepHours > 24)
+      e.sleepHours = "Enter a value between 0–24";
+    if (isNaN(form.studyHours) || form.studyHours < 0 || form.studyHours > 24)
+      e.studyHours = "Enter a value between 0–24";
+    if (
+      isNaN(form.stressLevel) ||
+      form.stressLevel < 1 ||
+      form.stressLevel > 10
+    )
+      e.stressLevel = "Enter a value between 1–10";
+    if (isNaN(form.tasksPending) || form.tasksPending < 0)
+      e.tasksPending = "Cannot be negative";
+    if (isNaN(form.deadlinesSoon) || form.deadlinesSoon < 0)
+      e.deadlinesSoon = "Cannot be negative";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleChange = (key: keyof BurnoutInput, value: number) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+  const handleChange = (key: keyof BurnoutInput, rawValue: string) => {
+    setRaw((prev) => ({ ...prev, [key]: rawValue }));
+    const n = parseFloat(rawValue);
+    // Only commit to form state when we have a real number
+    if (!isNaN(n)) {
+      setForm((prev) => ({ ...prev, [key]: n }));
+    }
     setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
 
@@ -124,7 +145,7 @@ export default function BurnoutForm({ onSubmit, loading }: BurnoutFormProps) {
                 {label}
               </label>
               <span className="rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-600 dark:bg-sky-900/30 dark:text-sky-400">
-                {form[key]} {unit}
+                {isNaN(form[key] as number) ? "—" : form[key]} {unit}
               </span>
             </div>
             <input
@@ -133,8 +154,8 @@ export default function BurnoutForm({ onSubmit, loading }: BurnoutFormProps) {
               min={min}
               max={max}
               step={step}
-              value={form[key]}
-              onChange={(e) => handleChange(key, parseFloat(e.target.value))}
+              value={raw[key]}
+              onChange={(e) => handleChange(key, e.target.value)}
               className={`w-full rounded-lg border px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-sky-400 dark:bg-slate-800 dark:text-slate-100 ${
                 errors[key]
                   ? "border-red-400 focus:ring-red-400"
