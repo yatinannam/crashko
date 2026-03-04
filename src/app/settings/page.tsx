@@ -137,39 +137,6 @@ export default function SettingsPage() {
             </div>
           </Section>
 
-          {/* About */}
-          <Section title="About">
-            <div className="space-y-2 text-sm text-slate-500 dark:text-slate-400">
-              <p>
-                <span className="font-semibold text-slate-700 dark:text-slate-300">
-                  Crashko
-                </span>{" "}
-                is an AI-powered burnout prediction tool for students. Log your
-                sleep, study hours, stress, tasks, and upcoming deadlines each
-                day to get a burnout score, crash probability, and a
-                personalized AI recovery plan.
-              </p>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                {[
-                  { label: "Model", value: "llama-3.3-70b" },
-                  { label: "Engine", value: "Next.js 15 + Bun" },
-                  { label: "Database", value: "MongoDB Atlas" },
-                  { label: "AI Provider", value: "Groq" },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-xl bg-slate-50 px-3 py-2 dark:bg-slate-800"
-                  >
-                    <p className="text-xs text-slate-400">{item.label}</p>
-                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                      {item.value}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Section>
-
           {/* Danger zone */}
           <Section title="Danger Zone" danger>
             <div>
