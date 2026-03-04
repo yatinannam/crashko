@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 
 const NAV_LINKS = [
   { href: "/", label: "Dashboard" },
@@ -14,6 +15,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { data: session, status } = useSession();
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -31,22 +33,50 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 sm:flex">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                isActive(link.href)
-                  ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
-                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        {/* Desktop nav + auth */}
+        <div className="hidden items-center gap-1 sm:flex">
+          <nav className="flex items-center gap-1">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  isActive(link.href)
+                    ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          {status !== "loading" && (
+            <div className="ml-2 flex items-center gap-2 border-l border-slate-200 pl-3 dark:border-slate-700">
+              {session ? (
+                <>
+                  <span className="max-w-35 truncate text-xs text-slate-500 dark:text-slate-400">
+                    {session.user?.email}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => signOut({ callbackUrl: "/login" })}
+                    className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className="rounded-lg bg-sky-500 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-sky-600"
+                >
+                  Sign in with Google
+                </Link>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Mobile hamburger */}
         <button
@@ -96,6 +126,39 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+
+          {/* Mobile auth */}
+          {status !== "loading" && (
+            <div className="mt-2 border-t border-slate-100 pt-2 dark:border-slate-800">
+              {session ? (
+                <div className="flex items-center justify-between px-3 py-2">
+                  <span className="max-w-50 truncate text-xs text-slate-500 dark:text-slate-400">
+                    {session.user?.email}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      signOut({ callbackUrl: "/login" });
+                    }}
+                    className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <div className="px-1 py-2">
+                  <Link
+                    href="/login"
+                    onClick={() => setOpen(false)}
+                    className="block rounded-lg bg-sky-500 px-3 py-2 text-center text-sm font-semibold text-white transition hover:bg-sky-600"
+                  >
+                    Sign in with Google
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </header>

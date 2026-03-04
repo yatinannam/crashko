@@ -34,7 +34,7 @@ export default function ScoreCard({ result }: ScoreCardProps) {
 
   return (
     <div
-      className={`w-full rounded-2xl border bg-gradient-to-br p-6 shadow-sm ${cfg.bg} ${cfg.border}`}
+      className={`w-full rounded-2xl border bg-linear-to-br p-6 shadow-sm ${cfg.bg} ${cfg.border}`}
     >
       <div className="flex items-start justify-between">
         {/* Score */}

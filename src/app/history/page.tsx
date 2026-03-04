@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-
-const USER_ID_KEY = "crashko_user_id";
-const DEFAULT_USER_ID = "anon";
+import { useSession } from "next-auth/react";
 
 interface LogEntry {
   _id: string;
@@ -35,7 +33,8 @@ const SCORE_BAR: Record<string, string> = {
 };
 
 export default function HistoryPage() {
-  const [userId, setUserId] = useState(DEFAULT_USER_ID);
+  const { data: session } = useSession();
+  const userId = session?.user?.id ?? "";
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -43,18 +42,11 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  useEffect(() => {
-    const stored = localStorage.getItem(USER_ID_KEY);
-    if (stored) setUserId(stored);
-  }, []);
-
   const fetchLogs = useCallback(
     async (p: number) => {
       setLoading(true);
       try {
-        const res = await fetch(
-          `/api/history?userId=${encodeURIComponent(userId)}&page=${p}&limit=10`,
-        );
+        const res = await fetch(`/api/history?page=${p}&limit=10`);
         const json = await res.json();
         setLogs(json.logs ?? []);
         setTotal(json.total ?? 0);
@@ -70,8 +62,8 @@ export default function HistoryPage() {
   );
 
   useEffect(() => {
-    fetchLogs(1);
-  }, [fetchLogs]);
+    if (userId) fetchLogs(1);
+  }, [fetchLogs, userId]);
 
   const fmtDate = (iso: string) =>
     new Date(iso).toLocaleString("en-US", {

@@ -115,7 +115,7 @@ export default function ChatbotPanel({
                 }`}
               >
                 <span
-                  className={`mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border-2 transition-all ${
+                  className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
                     checkedSteps.has(i)
                       ? "border-emerald-400 bg-emerald-400"
                       : "border-slate-300 dark:border-slate-500"

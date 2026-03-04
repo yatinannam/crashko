@@ -1,47 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 
-const USER_ID_KEY = "crashko_user_id";
-const DEFAULT_USER_ID = "anon";
-
 export default function SettingsPage() {
-  const [userId, setUserId] = useState(DEFAULT_USER_ID);
-  const [inputId, setInputId] = useState(DEFAULT_USER_ID);
-  const [saved, setSaved] = useState(false);
+  const { data: session } = useSession();
   const [clearing, setClearing] = useState(false);
   const [cleared, setCleared] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(USER_ID_KEY) ?? DEFAULT_USER_ID;
-    setUserId(stored);
-    setInputId(stored);
+    // Remove any legacy localStorage userId that may have been set previously
+    localStorage.removeItem("crashko_user_id");
   }, []);
 
-  const handleSave = () => {
-    const trimmed = inputId.trim() || DEFAULT_USER_ID;
-    localStorage.setItem(USER_ID_KEY, trimmed);
-    setUserId(trimmed);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
-
   const handleClearData = async () => {
-    if (
-      !confirm(`Delete ALL logs for user "${userId}"? This cannot be undone.`)
-    )
+    if (!confirm("Delete ALL your burnout logs? This cannot be undone."))
       return;
     setClearing(true);
     try {
-      await fetch(
-        `/api/history?userId=${encodeURIComponent(userId)}&deleteAll=true`,
-        { method: "DELETE" },
-      );
+      await fetch("/api/history", { method: "DELETE" });
       setCleared(true);
       setTimeout(() => setCleared(false), 3000);
     } catch {
-      // silently ignore — the API may not support DELETE yet
+      // silently ignore
     } finally {
       setClearing(false);
     }
@@ -61,43 +43,26 @@ export default function SettingsPage() {
 
         <div className="flex flex-col gap-5">
           {/* Profile card */}
-          <Section title="Profile">
+          <Section title="Account">
             <div className="flex flex-col gap-3">
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-slate-500 dark:text-slate-400">
-                  User ID
-                </label>
-                <p className="mb-2 text-xs text-slate-400">
-                  Logs are stored under this ID. Change it to switch between
-                  different profiles stored in the same database.
-                </p>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={inputId}
-                    onChange={(e) => {
-                      setInputId(e.target.value);
-                      setSaved(false);
-                    }}
-                    placeholder="e.g. your-name"
-                    className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-sky-600 dark:focus:ring-sky-900/30"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleSave}
-                    className="rounded-xl bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-600 active:bg-sky-700"
-                  >
-                    {saved ? "Saved" : "Save"}
-                  </button>
-                </div>
-              </div>
-
-              <div className="rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800">
-                <p className="text-xs text-slate-400">Active user ID</p>
-                <p className="mt-0.5 font-mono text-sm font-semibold text-slate-800 dark:text-slate-100">
-                  {userId}
-                </p>
-              </div>
+              {session?.user ? (
+                <>
+                  <div className="rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800">
+                    <p className="text-xs text-slate-400">Name</p>
+                    <p className="mt-0.5 text-sm font-semibold text-slate-800 dark:text-slate-100">
+                      {session.user.name ?? "—"}
+                    </p>
+                  </div>
+                  <div className="rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800">
+                    <p className="text-xs text-slate-400">Email</p>
+                    <p className="mt-0.5 text-sm font-semibold text-slate-800 dark:text-slate-100">
+                      {session.user.email ?? "—"}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-slate-400">Not signed in.</p>
+              )}
             </div>
           </Section>
 
@@ -141,11 +106,8 @@ export default function SettingsPage() {
           <Section title="Danger Zone" danger>
             <div>
               <p className="mb-3 text-sm text-slate-500 dark:text-slate-400">
-                Permanently delete all burnout logs for user{" "}
-                <span className="font-mono font-semibold text-slate-700 dark:text-slate-300">
-                  {userId}
-                </span>
-                . This action cannot be undone.
+                Permanently delete all your burnout logs. This action cannot be
+                undone.
               </p>
               <button
                 type="button"

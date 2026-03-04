@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import { useBurnoutForm } from "@/hooks/useBurnoutForm";
 import { useTrends } from "@/hooks/useTrends";
 import BurnoutForm from "@/components/BurnoutForm";
@@ -9,16 +10,16 @@ import TrendGraph from "@/components/TrendGraph";
 import FocusModeCard from "@/components/FocusModeCard";
 import CrashAlertBanner from "@/components/CrashAlertBanner";
 
-const USER_ID = "anon";
-
 export default function Home() {
+  const { data: session } = useSession();
+  const userId = session?.user?.id ?? "";
   const { loading, error, response, submitted, submitForm, lastInput, reset } =
-    useBurnoutForm(USER_ID);
+    useBurnoutForm(userId);
   const {
     data: trendData,
     loading: trendLoading,
     refetch: refetchTrends,
-  } = useTrends(USER_ID, 7);
+  } = useTrends(userId, 7);
 
   const handleSubmit = async (data: Parameters<typeof submitForm>[0]) => {
     await submitForm(data);

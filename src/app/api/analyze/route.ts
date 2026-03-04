@@ -1,15 +1,32 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
 import { connectToMongo } from "@/lib/mongodb";
 import BurnoutLog from "@/models/BurnoutLog";
 import { computeBurnout } from "@/lib/burnoutEngine";
 import { callGroq } from "@/lib/groqClient";
 import { burnoutInputSchema } from "@/lib/validations";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function POST(req: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const userId = session.user.id;
+
+    // Rate limit: 8 analyses per minute per user
+    if (!rateLimit(`analyze:${userId}`, 8, 60_000)) {
+      return NextResponse.json(
+        { error: "Too many requests. Please wait a minute." },
+        { status: 429 },
+      );
+    }
+
     const body = await req.json();
 
-    // Validate input
+    // Validate input (userId is read from session, not request body)
     const parsed = burnoutInputSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
@@ -18,7 +35,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { sleepHours, studyHours, stressLevel, tasksPending, deadlinesSoon, userId } =
+    const { sleepHours, studyHours, stressLevel, tasksPending, deadlinesSoon } =
       parsed.data;
 
     const db = await connectToMongo();

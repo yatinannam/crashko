@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { useTrends } from "@/hooks/useTrends";
 import TrendGraph from "@/components/TrendGraph";
 
-const USER_ID = "anon";
 const RANGES = [
   { label: "7 days", value: 7 },
   { label: "14 days", value: 14 },
@@ -21,7 +21,8 @@ const RISK_COLOR: Record<string, string> = {
 
 export default function TrendsPage() {
   const [days, setDays] = useState(7);
-  const { data, loading } = useTrends(USER_ID, days);
+  const { data: session } = useSession();
+  const { data, loading } = useTrends(session?.user?.id ?? "", days);
 
   // Compute summary stats from trend data
   const avg = (arr: number[]) =>

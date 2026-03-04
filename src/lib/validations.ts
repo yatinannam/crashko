@@ -25,8 +25,8 @@ export const burnoutInputSchema = z.object({
     .number({ error: "Deadlines within 48h required" })
     .min(0, "Cannot be negative")
     .max(20, "Too many deadlines"),
-
-  userId: z.string().optional().default("anon"),
+  // userId is intentionally excluded — always read from the authenticated session server-side
 });
+
 
 export type BurnoutInputSchema = z.infer<typeof burnoutInputSchema>;
