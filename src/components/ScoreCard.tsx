@@ -82,7 +82,6 @@ export default function ScoreCard({ result }: ScoreCardProps) {
 
       {/* Focus Mode */}
       <div className="mt-4 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-        <span className="text-base">⏱️</span>
         <span>
           Recommended focus block:{" "}
           <strong className="text-slate-800 dark:text-slate-100">
