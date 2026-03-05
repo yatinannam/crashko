@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "doppler run -- next dev",
     "dev:local": "next dev",
-    "build": "doppler run -- next build",
+    "build": "next build",
     "build:local": "next build",
     "start": "next start",
     "lint": "biome check",
