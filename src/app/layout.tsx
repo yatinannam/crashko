@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Crashko — Know Before You Crash",
+  title: "Crashko",
   description:
     "AI-powered burnout prediction and recovery assistant for students. Track sleep, study load, and stress to predict and prevent burnout.",
 };
