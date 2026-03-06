@@ -25,16 +25,21 @@ const DEVELOPERS = [
 ];
 
 const NAV_LINKS = [
-  { href: "/",         label: "Dashboard" },
-  { href: "/trends",   label: "Trends"    },
-  { href: "/history",  label: "History"   },
-  { href: "/settings", label: "Settings"  },
+  { href: "/", label: "Dashboard" },
+  { href: "/trends", label: "Trends" },
+  { href: "/history", label: "History" },
+  { href: "/settings", label: "Settings" },
 ];
 
 /* ── Avatar ─────────────────────────────────────────────────── */
 function Avatar({ src, name }: { src?: string | null; name?: string | null }) {
   const initials = name
-    ? name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
+    ? name
+        .split(" ")
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
     : "?";
 
   if (src) {
@@ -61,14 +66,14 @@ function DropPanel({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -6, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0,  scale: 1    }}
-      exit ={{ opacity: 0, y: -6, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -6, scale: 0.97 }}
       transition={{ duration: 0.16, ease: "easeOut" }}
       className="absolute right-0 top-11 z-50 overflow-hidden rounded-2xl shadow-2xl"
       style={{
-        background:    "rgba(12, 15, 26, 0.97)",
-        border:        "1px solid rgba(255,255,255,0.10)",
-        backdropFilter:"blur(24px)",
+        background: "rgba(12, 15, 26, 0.97)",
+        border: "1px solid rgba(255,255,255,0.10)",
+        backdropFilter: "blur(24px)",
       }}
     >
       {children}
@@ -78,10 +83,10 @@ function DropPanel({ children }: { children: React.ReactNode }) {
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [mobileOpen,  setMobileOpen]  = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [devOpen,     setDevOpen]     = useState(false);
-  const [logoShake,   setLogoShake]   = useState(false);
+  const [devOpen, setDevOpen] = useState(false);
+  const [logoShake, setLogoShake] = useState(false);
 
   const authAreaRef = useRef<HTMLDivElement>(null);
   const { data: session, status } = useSession();
@@ -91,12 +96,17 @@ export default function Navbar() {
 
   const handleLogoClick = () => {
     setLogoShake(false);
-    requestAnimationFrame(() => requestAnimationFrame(() => setLogoShake(true)));
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => setLogoShake(true)),
+    );
   };
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (authAreaRef.current && !authAreaRef.current.contains(e.target as Node)) {
+      if (
+        authAreaRef.current &&
+        !authAreaRef.current.contains(e.target as Node)
+      ) {
         setProfileOpen(false);
         setDevOpen(false);
       }
@@ -109,14 +119,13 @@ export default function Navbar() {
     <header
       className="sticky top-0 z-50"
       style={{
-        background:           "rgba(5, 7, 15, 0.80)",
-        backdropFilter:       "blur(24px)",
+        background: "rgba(5, 7, 15, 0.80)",
+        backdropFilter: "blur(24px)",
         WebkitBackdropFilter: "blur(24px)",
-        borderBottom:         "1px solid rgba(255,255,255,0.08)",
+        borderBottom: "1px solid rgba(255,255,255,0.08)",
       }}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-
         {/* ── Logo ──────────────────────────────────────────── */}
         <Link
           href="/"
@@ -133,7 +142,6 @@ export default function Navbar() {
 
         {/* ── Desktop ───────────────────────────────────────── */}
         <div className="hidden items-center gap-1 sm:flex">
-
           {/* Nav links */}
           <nav className="flex items-center gap-0.5">
             {NAV_LINKS.map((link) => (
@@ -141,7 +149,9 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={`relative rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-200 ${
-                  isActive(link.href) ? "text-white" : "text-slate-400 hover:text-white"
+                  isActive(link.href)
+                    ? "text-white"
+                    : "text-slate-400 hover:text-white"
                 }`}
               >
                 {isActive(link.href) && (
@@ -170,7 +180,10 @@ export default function Navbar() {
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={() => { setDevOpen((v) => !v); setProfileOpen(false); }}
+                      onClick={() => {
+                        setDevOpen((v) => !v);
+                        setProfileOpen(false);
+                      }}
                       aria-label="Developer info"
                       aria-expanded={devOpen}
                       className="flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-semibold transition-all"
@@ -199,7 +212,7 @@ export default function Navbar() {
                         <DropPanel>
                           <div className="w-64 p-3 space-y-2">
                             <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-widest text-violet-400">
-                              Meet the Builders
+                              Meet the Devs
                             </p>
                             {DEVELOPERS.map((dev, i) => (
                               <div
@@ -207,18 +220,26 @@ export default function Navbar() {
                                 className="rounded-xl px-3 py-3"
                                 style={{
                                   background: "rgba(255,255,255,0.04)",
-                                  border:     "1px solid rgba(255,255,255,0.07)",
+                                  border: "1px solid rgba(255,255,255,0.07)",
                                 }}
                               >
-                                <p className="text-sm font-semibold text-white">{dev.name}</p>
-                                <p className="mb-2.5 text-xs text-slate-500">{dev.role}</p>
+                                <p className="text-sm font-semibold text-white">
+                                  {dev.name}
+                                </p>
+                                <p className="mb-2.5 text-xs text-slate-500">
+                                  {dev.role}
+                                </p>
                                 <div className="flex gap-2">
                                   <a
                                     href={dev.github}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:text-white"
-                                    style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)" }}
+                                    style={{
+                                      border:
+                                        "1px solid rgba(255,255,255,0.08)",
+                                      background: "rgba(255,255,255,0.03)",
+                                    }}
                                   >
                                     <Github size={11} />
                                     GitHub
@@ -228,7 +249,11 @@ export default function Navbar() {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:text-blue-400"
-                                    style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)" }}
+                                    style={{
+                                      border:
+                                        "1px solid rgba(255,255,255,0.08)",
+                                      background: "rgba(255,255,255,0.03)",
+                                    }}
                                   >
                                     <Linkedin size={11} />
                                     LinkedIn
@@ -246,12 +271,18 @@ export default function Navbar() {
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={() => { setProfileOpen((v) => !v); setDevOpen(false); }}
+                      onClick={() => {
+                        setProfileOpen((v) => !v);
+                        setDevOpen(false);
+                      }}
                       aria-label="Account menu"
                       aria-expanded={profileOpen}
                       className="flex items-center rounded-full p-0.5 transition hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
                     >
-                      <Avatar src={session.user?.image} name={session.user?.name} />
+                      <Avatar
+                        src={session.user?.image}
+                        name={session.user?.name}
+                      />
                     </button>
 
                     <AnimatePresence>
@@ -260,9 +291,15 @@ export default function Navbar() {
                           <div className="w-56">
                             <div
                               className="flex items-center gap-3 px-4 py-3.5"
-                              style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
+                              style={{
+                                borderBottom:
+                                  "1px solid rgba(255,255,255,0.07)",
+                              }}
                             >
-                              <Avatar src={session.user?.image} name={session.user?.name} />
+                              <Avatar
+                                src={session.user?.image}
+                                name={session.user?.name}
+                              />
                               <div className="min-w-0">
                                 {session.user?.name && (
                                   <p className="truncate text-sm font-semibold text-white">
@@ -299,7 +336,8 @@ export default function Navbar() {
                   onClick={() => signIn("google", { callbackUrl: "/" })}
                   className="rounded-xl px-4 py-2 text-sm font-semibold text-white transition-all hover:opacity-90"
                   style={{
-                    background: "linear-gradient(135deg, #06d6d0 0%, #818cf8 50%, #f472b6 100%)",
+                    background:
+                      "linear-gradient(135deg, #06d6d0 0%, #818cf8 50%, #f472b6 100%)",
                   }}
                 >
                   Sign in with Google
@@ -316,11 +354,25 @@ export default function Navbar() {
           onClick={() => setMobileOpen((o) => !o)}
           aria-label="Toggle menu"
         >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
             {mobileOpen ? (
-              <path fillRule="evenodd" clipRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+              />
             ) : (
-              <path fillRule="evenodd" clipRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" />
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+              />
             )}
           </svg>
         </button>
@@ -332,7 +384,7 @@ export default function Navbar() {
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
-            exit ={{ opacity: 0, height: 0 }}
+            exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
             className="overflow-hidden sm:hidden"
             style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
@@ -361,7 +413,10 @@ export default function Navbar() {
                   {session ? (
                     <>
                       <div className="flex items-center gap-3 px-3 pb-1">
-                        <Avatar src={session.user?.image} name={session.user?.name} />
+                        <Avatar
+                          src={session.user?.image}
+                          name={session.user?.name}
+                        />
                         <div className="min-w-0">
                           <p className="truncate text-sm font-semibold text-white">
                             {session.user?.name}
@@ -374,19 +429,37 @@ export default function Navbar() {
 
                       <div
                         className="rounded-xl p-3 space-y-2"
-                        style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+                        style={{
+                          background: "rgba(255,255,255,0.03)",
+                          border: "1px solid rgba(255,255,255,0.07)",
+                        }}
                       >
                         <p className="text-xs font-semibold uppercase tracking-widest text-violet-400 mb-2">
                           Developers
                         </p>
                         {DEVELOPERS.map((dev, i) => (
-                          <div key={i} className="flex items-center justify-between">
-                            <span className="text-xs text-slate-400">{dev.name}</span>
+                          <div
+                            key={i}
+                            className="flex items-center justify-between"
+                          >
+                            <span className="text-xs text-slate-400">
+                              {dev.name}
+                            </span>
                             <div className="flex gap-3">
-                              <a href={dev.github} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-white transition-colors">
+                              <a
+                                href={dev.github}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-slate-500 hover:text-white transition-colors"
+                              >
                                 <Github size={13} />
                               </a>
-                              <a href={dev.linkedin} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-blue-400 transition-colors">
+                              <a
+                                href={dev.linkedin}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-slate-500 hover:text-blue-400 transition-colors"
+                              >
                                 <Linkedin size={13} />
                               </a>
                             </div>
@@ -396,7 +469,10 @@ export default function Navbar() {
 
                       <button
                         type="button"
-                        onClick={() => { setMobileOpen(false); signOut({ callbackUrl: "/login" }); }}
+                        onClick={() => {
+                          setMobileOpen(false);
+                          signOut({ callbackUrl: "/login" });
+                        }}
                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-400 transition hover:bg-red-500/10"
                       >
                         <LogOut size={14} />
@@ -406,10 +482,14 @@ export default function Navbar() {
                   ) : (
                     <button
                       type="button"
-                      onClick={() => { setMobileOpen(false); signIn("google", { callbackUrl: "/" }); }}
+                      onClick={() => {
+                        setMobileOpen(false);
+                        signIn("google", { callbackUrl: "/" });
+                      }}
                       className="block w-full rounded-xl px-4 py-2 text-center text-sm font-semibold text-white"
                       style={{
-                        background: "linear-gradient(135deg, #06d6d0 0%, #818cf8 50%, #f472b6 100%)",
+                        background:
+                          "linear-gradient(135deg, #06d6d0 0%, #818cf8 50%, #f472b6 100%)",
                       }}
                     >
                       Sign in with Google
