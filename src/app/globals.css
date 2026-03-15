@@ -82,6 +82,29 @@ html { scrollbar-width: thin; scrollbar-color: rgba(167, 139, 250, 0.4) transpar
 }
 .logo-shake { animation: logo-shake 0.45s ease; }
 
+.logo-wordmark {
+  display: inline-block;
+  transform-origin: 50% 70%;
+  transition: transform 180ms ease, filter 220ms ease;
+  will-change: transform, filter;
+}
+
+.logo-interactive:focus-visible .logo-wordmark {
+  transform: scale(1.05);
+  filter:
+    drop-shadow(0 0 6px rgba(6, 214, 208, 0.55))
+    drop-shadow(0 0 14px rgba(167, 139, 250, 0.35));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .logo-interactive:hover .logo-wordmark {
+    transform: scale(1.05);
+    filter:
+      drop-shadow(0 0 6px rgba(6, 214, 208, 0.55))
+      drop-shadow(0 0 14px rgba(167, 139, 250, 0.35));
+  }
+}
+
 /* Iridescent hue-cycle for prism text */
 @keyframes iris-hue {
   0%   { filter: hue-rotate(0deg)   brightness(1.1); }

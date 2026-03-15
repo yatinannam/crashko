@@ -3,6 +3,7 @@
 import ShinyText from "@/components/ShinyText";
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
+import { useEffect, useState } from "react";
 import { motion, type Variants } from "framer-motion";
 import {
   ArrowRight,
@@ -13,6 +14,7 @@ import {
   Bell,
   History,
   ChevronDown,
+  ChevronUp,
   CheckCircle2,
 } from "lucide-react";
 
@@ -123,12 +125,60 @@ const FAQS = [
 
 export default function LandingPage() {
   const { data: session } = useSession();
+  const [showScrollHint, setShowScrollHint] = useState(true);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    let rafId = 0;
+
+    const syncScrollUI = () => {
+      const y = window.scrollY;
+      const nextShowHint = y < 40;
+      const nextShowTop = y > 220;
+
+      setShowScrollHint((prev) =>
+        prev === nextShowHint ? prev : nextShowHint,
+      );
+      setShowBackToTop((prev) => (prev === nextShowTop ? prev : nextShowTop));
+    };
+
+    const onScroll = () => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = 0;
+        syncScrollUI();
+      });
+    };
+
+    syncScrollUI();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   const handleGetStarted = () => {
     if (session?.user) {
       window.location.href = "/dashboard";
     } else {
       signIn("google", { callbackUrl: "/dashboard" });
     }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const scrollDown = () => {
+    const next = document.getElementById("how-it-works");
+    if (next) {
+      next.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    window.scrollTo({ top: window.innerHeight * 0.85, behavior: "smooth" });
   };
 
   return (
@@ -147,7 +197,7 @@ export default function LandingPage() {
           }}
         >
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-          Free for students · No credit card needed
+          Free for students
         </motion.div>
 
         <motion.div
@@ -194,7 +244,7 @@ export default function LandingPage() {
                 "linear-gradient(135deg, #06d6d0 0%, #818cf8 50%, #f472b6 100%)",
             }}
           >
-            Get Started Free
+            Get Started
             <ArrowRight size={15} />
           </button>
           <a
@@ -211,16 +261,42 @@ export default function LandingPage() {
         </motion.div>
 
         {/* Scroll hint */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.4, duration: 0.6 }}
-          className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-1 text-slate-700"
-        >
-          <span className="text-[10px] uppercase tracking-widest">Scroll</span>
-          <ChevronDown size={13} className="animate-bounce" />
-        </motion.div>
+        {showScrollHint && (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+            onClick={scrollDown}
+            className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-1 text-slate-700 transition-colors hover:text-slate-500"
+          >
+            <span className="text-[10px] uppercase tracking-widest">
+              Scroll
+            </span>
+            <ChevronDown size={13} className="animate-bounce" />
+          </motion.button>
+        )}
       </section>
+
+      {showBackToTop && (
+        <motion.button
+          type="button"
+          aria-label="Back to top"
+          onClick={scrollToTop}
+          initial={{ opacity: 0, y: 12, scale: 0.92 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-3 z-40 inline-flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-full px-3 py-2 text-xs font-semibold text-white shadow-lg sm:bottom-6 sm:right-6 sm:gap-1.5 sm:px-3.5"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(6,214,208,0.95) 0%, rgba(129,140,248,0.95) 55%, rgba(244,114,182,0.95) 100%)",
+            border: "1px solid rgba(255,255,255,0.22)",
+          }}
+        >
+          <ChevronUp size={14} />
+          <span className="hidden sm:inline">Top</span>
+        </motion.button>
+      )}
 
       {/* ── PROBLEM / STATS ───────────────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-4 py-24 text-center">

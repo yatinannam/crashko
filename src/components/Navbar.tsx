@@ -139,10 +139,10 @@ export default function Navbar() {
           href={logoHref}
           onClick={handleLogoClick}
           onAnimationEnd={() => setLogoShake(false)}
-          className="flex items-center gap-2"
+          className="logo-interactive flex items-center gap-2"
         >
           <span
-            className={`text-2xl font-extrabold tracking-tight gradient-text${logoShake ? " logo-shake" : ""}`}
+            className={`logo-wordmark text-2xl font-extrabold tracking-tight gradient-text${logoShake ? " logo-shake" : ""}`}
           >
             Crashko
           </span>

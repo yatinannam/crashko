@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { LayoutDashboard, TrendingUp, Clock, Trash2 } from "lucide-react";
 
 const NAV_LINKS = [
@@ -85,14 +85,15 @@ export default function SettingsPage() {
   const [clearing, setClearing] = useState(false);
   const [cleared, setCleared] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<
+    "clear-logs" | "delete-account" | null
+  >(null);
 
   useEffect(() => {
     localStorage.removeItem("crashko_user_id");
   }, []);
 
   const handleClearData = async () => {
-    if (!confirm("Delete ALL your burnout logs? This cannot be undone."))
-      return;
     setClearing(true);
     try {
       await fetch("/api/history", { method: "DELETE" });
@@ -106,12 +107,6 @@ export default function SettingsPage() {
   };
 
   const handleDeleteAccount = async () => {
-    if (
-      !confirm(
-        "Delete your account and all burnout logs? This cannot be undone.",
-      )
-    )
-      return;
     setDeletingAccount(true);
     try {
       const res = await fetch("/api/account", { method: "DELETE" });
@@ -123,6 +118,31 @@ export default function SettingsPage() {
       // silently ignore
     } finally {
       setDeletingAccount(false);
+    }
+  };
+
+  const isConfirming = clearing || deletingAccount;
+
+  const confirmTitle =
+    confirmAction === "clear-logs" ? "Delete all logs?" : "Delete account?";
+
+  const confirmMessage =
+    confirmAction === "clear-logs"
+      ? "This will permanently remove all your burnout logs. This action cannot be undone."
+      : "This will permanently delete your account and all burnout logs. This action cannot be undone.";
+
+  const confirmCta =
+    confirmAction === "clear-logs" ? "Delete Logs" : "Delete Account";
+
+  const handleConfirmProceed = async () => {
+    if (confirmAction === "clear-logs") {
+      await handleClearData();
+      setConfirmAction(null);
+      return;
+    }
+
+    if (confirmAction === "delete-account") {
+      await handleDeleteAccount();
     }
   };
 
@@ -195,7 +215,7 @@ export default function SettingsPage() {
             <button
               type="button"
               disabled={clearing}
-              onClick={handleClearData}
+              onClick={() => setConfirmAction("clear-logs")}
               className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-red-400 transition-all hover:opacity-90 disabled:opacity-50"
               style={{
                 background: "rgba(239,68,68,0.08)",
@@ -213,7 +233,7 @@ export default function SettingsPage() {
             <button
               type="button"
               disabled={deletingAccount}
-              onClick={handleDeleteAccount}
+              onClick={() => setConfirmAction("delete-account")}
               className="mt-3 flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-red-300 transition-all hover:opacity-90 disabled:opacity-50"
               style={{
                 background: "rgba(239,68,68,0.14)",
@@ -226,6 +246,70 @@ export default function SettingsPage() {
           </GlassSection>
         </div>
       </main>
+
+      <AnimatePresence>
+        {confirmAction && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/65 p-4 sm:items-center"
+            onClick={() => {
+              if (!isConfirming) setConfirmAction(null);
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.97 }}
+              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md rounded-2xl p-5 sm:p-6"
+              style={{
+                background: "rgba(12,15,26,0.98)",
+                border: "1px solid rgba(239,68,68,0.3)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
+              }}
+            >
+              <h3 className="text-lg font-semibold text-white">
+                {confirmTitle}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                {confirmMessage}
+              </p>
+
+              <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  disabled={isConfirming}
+                  onClick={() => setConfirmAction(null)}
+                  className="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-300 transition-all hover:text-white disabled:opacity-50"
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={isConfirming}
+                  onClick={handleConfirmProceed}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-all disabled:opacity-50"
+                  style={{
+                    background: "rgba(239,68,68,0.85)",
+                    border: "1px solid rgba(239,68,68,1)",
+                  }}
+                >
+                  <Trash2 size={14} />
+                  {isConfirming ? "Processing…" : confirmCta}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
