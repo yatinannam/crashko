@@ -163,7 +163,7 @@ openssl rand -base64 32
 ### Prerequisites
 
 - Node.js 20+
-- npm 10+
+- Bun >= 1.0
 - A running MongoDB instance or Atlas cluster
 
 ### Option A — Doppler (recommended for team use)
@@ -187,7 +187,7 @@ doppler setup
 Run the development server with secrets injected:
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 ### Option B — Without Doppler
@@ -195,7 +195,7 @@ npm run dev
 Manually create `.env.local` with the variables listed above, then run:
 
 ```bash
-npm run dev:local
+bun run dev:local
 ```
 
 The application will be available at [http://localhost:3000](http://localhost:3000).
@@ -206,13 +206,13 @@ The application will be available at [http://localhost:3000](http://localhost:30
 
 | Script                | Description                                      |
 | --------------------- | ------------------------------------------------ |
-| `npm run dev`         | Start dev server with Doppler secrets injected   |
-| `npm run dev:local`   | Start dev server using `.env.local`              |
-| `npm run build`       | Production build                                 |
-| `npm run build:local` | Production build using `.env.local`              |
-| `npm run start`       | Start production server (requires a prior build) |
-| `npm run lint`        | Run Biome linter                                 |
-| `npm run format`      | Auto-format all files with Biome                 |
+| `bun run dev`         | Start dev server with Doppler secrets injected   |
+| `bun run dev:local`   | Start dev server using `.env.local`              |
+| `bun run build`       | Production build                                 |
+| `bun run build:local` | Production build using `.env.local`              |
+| `bun run start`       | Start production server (requires a prior build) |
+| `bun run lint`        | Run Biome linter                                 |
+| `bun run format`      | Auto-format all files with Biome                 |
 
 ---
 
@@ -379,7 +379,7 @@ The project is deployed on Vercel.
 ### Deploy via CLI
 
 ```bash
-npm install -g vercel
+bun add -g vercel
 vercel login
 vercel --prod
 ```
