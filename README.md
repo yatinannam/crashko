@@ -86,7 +86,6 @@ src/
         [...nextauth]/route.ts
         signup/route.ts
     history/page.tsx
-    login/page.tsx
     settings/page.tsx
     signup/page.tsx
     trends/page.tsx
@@ -309,9 +308,9 @@ Google OAuth via NextAuth.js. JWT session strategy — no database sessions requ
 
 - `session.user.id` is populated from `token.sub` (Google subject ID)
 - All API routes verify the session server-side via `getServerSession(authOptions)` — the `userId` is never accepted from request bodies
-- Unauthenticated requests to protected pages are redirected to `/login` by the NextAuth middleware in `src/proxy.ts`
+- Unauthenticated requests to protected pages are redirected to `/signup` by the NextAuth middleware in `src/proxy.ts`
 - The root route (`/`) is public; the app dashboard lives at `/dashboard`
-- Authenticated users visiting `/login` or `/signup` are redirected to the dashboard
+- Authenticated users visiting `/signup` are redirected to the dashboard
 
 ---
 

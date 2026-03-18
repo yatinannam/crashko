@@ -3,9 +3,7 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    const isAuthPage =
-      req.nextUrl.pathname.startsWith("/login") ||
-      req.nextUrl.pathname.startsWith("/signup");
+    const isAuthPage = req.nextUrl.pathname.startsWith("/signup");
     const isPublicLanding = req.nextUrl.pathname === "/";
 
     if (req.nextauth.token && (isAuthPage || isPublicLanding)) {
@@ -17,9 +15,7 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        const isAuthPage =
-          req.nextUrl.pathname.startsWith("/login") ||
-          req.nextUrl.pathname.startsWith("/signup");
+        const isAuthPage = req.nextUrl.pathname.startsWith("/signup");
         const isPublicLanding = req.nextUrl.pathname === "/";
 
         if (isAuthPage || isPublicLanding) return true;
@@ -27,7 +23,7 @@ export default withAuth(
       },
     },
     pages: {
-      signIn: "/login",
+      signIn: "/signup",
     },
   },
 );
@@ -39,7 +35,6 @@ export const config = {
     "/trends",
     "/history",
     "/settings",
-    "/login",
     "/signup",
   ],
 };

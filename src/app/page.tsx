@@ -560,7 +560,7 @@ export default function LandingPage() {
           <Link href="/legal" className="hover:text-slate-300">
             Privacy Policy
           </Link>
-          <Link href="/login" className="hover:text-slate-300">
+          <Link href="/signup" className="hover:text-slate-300">
             Sign In
           </Link>
         </div>
